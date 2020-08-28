@@ -30,7 +30,7 @@ time.sleep(60)
 btGrafico = driver.find_element_by_xpath("/html/body/div[2]/div/div/div/div[3]/dashboard-app/dashboard-viewport-provider/div/div/div[12]/div/div[1]/div/div/div/button")
 
 #print(receita)
-
+tlBrasil = driver.find_element_by_xpath("/html/body/div[2]/div/div/div/div[3]/dashboard-app/dashboard-viewport-provider/div/div/div[9]/div/div[2]/div/div/div/div/div/div/div/span")
 # aqui e feito um clique no elemento que foi encontrado acima
 btGrafico.click()
 
@@ -59,16 +59,83 @@ btMudarDados.click()
 dados = driver.find_element_by_xpath("/html/body/div[4]/span/div/div/div[2]/div[3]/div[1]/table")
 
 # aqui e pegado o codigo HTML que esta dentro da div bd01 no codigo que foi mostrado acima
-html = dados.get_attribute("innerHTML")
-
+html = dados.get_attribute("outerHTML")
+totalBr = tlBrasil.get_attribute("outerHTML")
 # com o codigo HTML dentro da variavel, vamos usar o BeautifulSoup para fazer o parser desse HTML
 soup = BeautifulSoup(html, "html.parser")
+posDetBr = BeautifulSoup(totalBr, "html.parser")
 # dentro da variavel soup temos o codigo html retornado pelo Selenium ja convertido para o BS
  # vou utilizar o metodo select_one para buscar o elemento table dentro desse codigo
 #table = soup.select_one("table")
 tabela = soup.find(name='table')
+th = tabela.find_all('span', class_ = 'euiTableCellContent__text')
+
+conteudo = []
+estados = []
+status = []
+tlExames = []
+titulo = []
+#icremento = 0
+#for i in th:
+  #print(i.next_element)
+  #titulo.append(i.next_element)
+  #icremento+= 1
+
+td = tabela.find_all('div', class_ = 'euiFlexItem euiFlexItem--flexGrowZero')
 
 
+for c in td:
+  #print(c.text)
+  conteudo.append(c.text)
+
+aux = 0
+aux1 = 0
+aux2 = 3
+aux3 = 6
+
+#print(conteudo)
+
+for y in conteudo:
+  if(aux == aux1):
+    estados.append(y)
+    aux1 = aux1 + 8
+  
+  if(aux == aux2):
+    status.append(y)
+    aux2 = aux2 + 8
+
+  if(aux == aux3):
+    tlExames.append(y)
+    aux3 = aux3 + 8
+
+  aux = aux + 1
+  #print(y)
+
+#print(estados)
+#print('==================')
+#print(status)
+#print('==================')
+#print(tlExames)
+#print('==================')
+#print(posDetBr)
+
+print("PERCENTUAL DE RESULTADOS POSITIVO/DETECTÁVEL POR ESTADOS")
+print("==============================================================")
+print("Total de resultados Positivo/Detectável no Brasil " + posDetBr.text)
+print("--------------------------------------------------------------")
+aux = 0
+for w in estados:
+  print(w + ":")
+  print("Total de exames: " + tlExames[aux])
+  print(str(round((float(tlExames[aux]) / float(posDetBr.text) * 100), 2)) + "%")
+  print("--------------------------------------------------------------")
+  aux += 1
+
+'''
 df_full = pd.read_html(str(tabela))
 df = df_full[['UF de residência', 'Resultados', 'Nº de exames realizados']]
 df.columns = ['Estado', 'Situação', 'Total de exames']
+
+print(titulo[0])
+print(titulo[1])
+print(titulo[2])'''
